@@ -1,0 +1,608 @@
+openapi: 3.0.3
+info:
+  title: Eco-monitoring - Gas analyzers
+  version: "1.0"
+servers:
+  - url: http://localhost:8000
+    description: web-app-api
+paths:
+  /cities:
+    get:
+      summary: The method of obtaining a list of cities
+      tags:
+        - Cities
+      operationId: getAllCities
+      responses:
+        '200':
+          description: Getting a list of cities
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Cities"
+        'default':
+          description: Something is wrong
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+    post:
+      summary: The method of creating a city
+      tags:
+        - Cities
+      operationId: createCity
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/City"
+      responses:
+        '200':
+          description: Successful creation of the city
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/City"
+        'default':
+          description: Something is wrong
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  /cities/{id}:
+    get:
+      summary: The method of obtaining a one city
+      tags:
+        - Cities
+      operationId: getCityById
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: City ID
+          schema:
+            type: string
+          example: 13
+      responses:
+        '200':
+          description:  Getting a city by Id
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/City"
+        'default':
+          description: Something is wrong
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+    delete:
+      summary: The method of deleting a city
+      tags:
+        - Cities
+      operationId: deleteCityById
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: City ID
+          schema:
+            type: string
+          example: 13
+      responses:
+        '200':
+          description: Successful deletion of the city
+          content:
+            application/json: {}
+        'default':
+          description: Something is wrong
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+
+  /gas_analyzers:
+    get:
+      summary: The method of obtaining a list of gas analyzers
+      tags:
+        - Gas Analyzers
+      operationId: getAllGasAnalyzers
+      responses:
+        '200':
+          description: Getting a list of Gas Analyzers
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GasAnalyzers"
+        'default':
+          description: Something is wrong
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+    post:
+      summary: The method of creating a gas analyzer
+      tags:
+        - Gas Analyzers
+      operationId: createGasAnalyzer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/GasAnalyzer"
+      responses:
+        '200':
+          description: Successful creation of the gas analyzer
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GasAnalyzer"
+        'default':
+          description: Something is wrong
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  /gas_analyzers/{measurement}:
+    get:
+      summary: The method of obtaining a gas analyzer
+      tags:
+        - Gas Analyzers
+      operationId: getGasAnalyzerById
+      parameters:
+        - name: measurement
+          in: path
+          required: true
+          description: Gaz Analyzer Measurement
+          schema:
+            type: string
+          example: some_gasanalyzer_measurement
+      responses:
+        '200':
+          description:  Getting a gas analyzer by id
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GasAnalyzer"
+        'default':
+          description: Something is wrong
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+    delete:
+      summary: The method of deleting a gas analyzer
+      tags:
+        - Gas Analyzers
+      operationId: deleteGasAnalyzerById
+      parameters:
+        - name: measurement
+          in: path
+          required: true
+          description: Gaz Analyzer Measurement
+          schema:
+            type: string
+          example: some_gasanalyzer_measurement
+      responses:
+        '200':
+          description: Successful deletion of the gas analyzer
+          content:
+            application/json: {}
+        'default':
+          description: Something is wrong
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  /gas_analyzers/city/{city_id}:
+    get:
+      summary: The method of obtaining a list of gas analyzers in city
+      tags:
+        - Gas Analyzers
+      operationId: getGasAnalyzersByCityId
+      parameters:
+        - name: city_id
+          in: path
+          required: true
+          description: City ID
+          schema:
+            type: string
+          example: 13
+      responses:
+        '200':
+          description:  Getting a list of gas analyzers by city id
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GasAnalyzer"
+        'default':
+          description: Something is wrong
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+
+  /companies:
+    get:
+      summary: The method of obtaining a list of companies
+      tags:
+        - Companies
+      operationId: getAllCompanies
+      responses:
+        '200':
+          description: Getting a list of companies
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Companies"
+        'default':
+          description: Something is wrong
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+    post:
+      summary: The method of creating a company
+      tags:
+        - Companies
+      operationId: createCompany
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Company"
+      responses:
+        '200':
+          description: Successful creation of the company
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Company"
+        'default':
+          description: Something is wrong
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  /companies/{id}:
+    get:
+      summary: The method of obtaining a company
+      tags:
+        - Companies
+      operationId: getCompanyById
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Company ID
+          schema:
+            type: string
+          example: 99
+      responses:
+        '200':
+          description:  Getting a company by id
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Company"
+        'default':
+          description: Something is wrong
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+    delete:
+      summary: The method of deleting a company
+      tags:
+        - Companies
+      operationId: deleteCompanyById
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Company ID
+          schema:
+            type: string
+          example: 99
+      responses:
+        '200':
+          description: Successful deletion of the company
+          content:
+            application/json: {}
+        'default':
+          description: Something is wrong
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  /companies/city/{city_id}:
+    get:
+      summary: The method of obtaining a list of companies in city
+      tags:
+        - Companies
+      operationId: getCompaniesByCityId
+      parameters:
+        - name: city_id
+          in: path
+          required: true
+          description: City ID
+          schema:
+            type: string
+          example: 13
+      responses:
+        '200':
+          description:  Getting a list of companies by city id
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Companies"
+        'default':
+          description: Something is wrong
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+
+  /pipes:
+    get:
+      summary: The method of obtaining a list of pipes
+      tags:
+        - Pipes
+      operationId: getAllPipes
+      responses:
+        '200':
+          description: Getting a list of pipes
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Pipes"
+        'default':
+          description: Something is wrong
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+    post:
+      summary: The method of creating a pipe
+      tags:
+        - Pipes
+      operationId: createPipe
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Pipe"
+      responses:
+        '200':
+          description: Successful creation of the pipe
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Pipe"
+        'default':
+          description: Something is wrong
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  /pipes/{measurement}:
+    get:
+      summary: The method of obtaining a pipe
+      tags:
+        - Pipes
+      operationId: getPipeById
+      parameters:
+        - name: measurement
+          in: path
+          required: true
+          description: Pipe Measurement
+          schema:
+            type: string
+          example: some_gasanalyzer_measurement
+      responses:
+        '200':
+          description:  Getting a pipe by id
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Pipe"
+        'default':
+          description: Something is wrong
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+    delete:
+      summary: The method of deleting a pipe
+      tags:
+        - Pipes
+      operationId: deletePipeById
+      parameters:
+        - name: measurement
+          in: path
+          required: true
+          description: Pipe Measurement
+          schema:
+            type: string
+          example: some_gasanalyzer_measurement
+      responses:
+        '200':
+          description: Successful deletion of the pipe
+          content:
+            application/json: {}
+        'default':
+          description: Something is wrong
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  /pipes/company/{company_id}:
+    get:
+      summary: The method of obtaining a list of pipes in company
+      tags:
+        - Pipes
+      operationId: getPipesByCityId
+      parameters:
+        - name: company_id
+          in: path
+          required: true
+          description: Company ID
+          schema:
+            type: string
+          example: 99
+      responses:
+        '200':
+          description:  Getting a list of pipes by company id
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Pipes"
+        'default':
+          description: Something is wrong
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+components:
+  schemas:
+    City:
+      type: object
+      required:
+        - name
+        - longitude
+        - latitude
+      properties:
+        id:
+          type: integer
+          example: 13
+        name:
+          type: string
+          example: Perm
+        latitude:
+          type: number
+          example: 58.029682
+        longitude:
+          type: number
+          example: 56.266792
+
+
+    Cities:
+      type: array
+      items:
+        $ref: "#/components/schemas/City"
+
+
+    Company:
+      type: object
+      required:
+        - city_id
+        - name
+        - sanitary_zone_radius_m
+        - longitude
+        - latitude
+      properties:
+        id:
+          type: integer
+          example: 99
+        city_id:
+          type: integer
+          example: 13
+        name:
+          type: string
+          example: Company-1
+        sanitary_zone_radius_m:
+          type: number
+          example: 100
+        latitude:
+          type: number
+          example: 58.029682
+        longitude:
+          type: number
+          example: 56.266792
+        description:
+          type: string
+          example: Some description
+
+
+    Companies:
+      type: array
+      items:
+        $ref: "#/components/schemas/Company"
+
+
+    Pipe:
+      type: object
+      required:
+        - company_id
+        - longitude
+        - latitude
+      properties:
+        measurement:
+          type: string
+          example: some_pipe_measurement
+        company_id:
+          type: integer
+          example: 99
+        latitude:
+          type: number
+          example: 58.029682
+        longitude:
+          type: number
+          example: 56.266792
+
+
+    Pipes:
+      type: array
+      items:
+        $ref: "#/components/schemas/Pipe"
+
+
+    GasAnalyzer:
+      type: object
+      required:
+        - city_id
+        - longitude
+        - latitude
+        - description
+      properties:
+        measurement:
+          type: string
+          example: some_gasanalyzer_measurement
+        city_id:
+          type: integer
+          example: 13
+        latitude:
+          type: number
+          example: 58.029682
+        longitude:
+          type: number
+          example: 56.266792
+        description:
+          type: string
+          example: Some description
+
+
+    GasAnalyzers:
+      type: array
+      items:
+        $ref: "#/components/schemas/GasAnalyzer"
+
+
+    Error:
+      type: object
+      required:
+        - code
+        - message
+      properties:
+        code:
+          type: integer
+        message:
+          type: string
+

@@ -1,0 +1,77 @@
+version: '3.8'
+services:
+    db:
+        image: postgres:14.1-alpine
+        container_name: postgresdb
+        restart: always
+        environment:
+            POSTGRES_USER:      ${POSTGRES_USER}
+            POSTGRES_PASSWORD:  ${POSTGRES_PASSWORD}
+            POSTGRES_DB:        ${POSTGRES_DB}
+        ports:
+            - 5432:5432
+        volumes:
+            - db:/var/lib/postgresql/data
+            - ./db/init.sql:/docker-entrypoint-initdb.d/create_tables.sql
+    influxdb:
+        image: influxdb:2.6-alpine
+        container_name: influxdb2
+#        restart: unless-stopped
+        environment:
+            DOCKER_INFLUXDB_INIT_MODE:          ${DOCKER_INFLUXDB_INIT_MODE}
+            DOCKER_INFLUXDB_INIT_USERNAME:      ${DOCKER_INFLUXDB_INIT_USERNAME}
+            DOCKER_INFLUXDB_INIT_PASSWORD:      ${DOCKER_INFLUXDB_INIT_PASSWORD}
+            DOCKER_INFLUXDB_INIT_ORG:           ${DOCKER_INFLUXDB_INIT_ORG}
+            DOCKER_INFLUXDB_INIT_BUCKET:        ${DOCKER_INFLUXDB_INIT_BUCKET}
+            DOCKER_INFLUXDB_INIT_ADMIN_TOKEN:   ${DOCKER_INFLUXDB_INIT_ADMIN_TOKEN}
+        volumes:
+            - influxdbv2:/var/lib/influxdb2:rw
+            - ./db/influx_db/pollution.csv:/bin/pollution.csv
+            - ./db/influx_db/influx_init.sh:/docker-entrypoint-initdb.d/influx_init.sh
+        ports:
+            - 8086:8086
+    web-app:
+        container_name: web-app-api
+        build:
+            context: .
+            target: builder
+        image: web-app
+        depends_on:
+            - db
+            - influxdb
+        ports:
+            - 8000:8000
+        env_file:
+            - .env
+        links:
+            - db
+            - influxdb
+        volumes:
+            -   ./app:/app
+        working_dir: /app/
+    admin:
+        image: adminer
+        restart: always
+        depends_on:
+            - db
+        ports:
+            - 8080:8080
+    swagger-editor:
+        image: swaggerapi/swagger-editor
+        container_name: "swagger-editor-container"
+        ports:
+            - "8081:8080"
+    swagger-ui:
+        image: swaggerapi/swagger-ui
+        container_name: "swagger-ui-container"
+        ports:
+            - "8082:8080"
+        volumes:
+            - ./swagger/swagger.yml:/swagger.yml
+        environment:
+            SWAGGER_JSON: /swagger.yml
+volumes:
+    db:
+        driver: local
+    influxdbv2:
+        driver: local
