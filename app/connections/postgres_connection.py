@@ -11,6 +11,8 @@ class PostgresConnection(BaseConnection):
     """
     Класс для работы с Postgres.
     """
+
+
     def conncet(self) -> None:
         """
         Соединение с Postgres
