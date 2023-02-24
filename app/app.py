@@ -1,3 +1,5 @@
+import json
+
 from flask import Flask, jsonify, request
 
 from connections.influx_connection import InfluxConnection
@@ -13,28 +15,52 @@ logger = get_logger(__name__)
 
 # %% cities
 @app.route('/cities', methods=['POST', 'GET'])
-def cities():
+async def cities():
     """
 
     :return:
     """
     if request.method == 'GET':
-        return "GET"
-    else:
-        return "POST"
+        result = await postgres_connection.get_cities()
+        return json.dumps(result, ensure_ascii=False)
+    elif request.method == 'POST':
+        data = request.get_json()
+        result = await postgres_connection.post_city(data)
+        return result
 
 
 @app.route('/cities/<id>', methods=['DELETE', 'GET'])
-def cities(id):
+async def cities_by_id(id):
     """
 
     :return:
     """
-    # id = request.args.get('id')
     if request.method == 'GET':
-        return "GET"
-    else:
-        return "DELETE"
+        result = await postgres_connection.get_city_by_id(id)
+        return json.dumps(result, ensure_ascii=False)
+    elif request.method == "DELETE":
+        result = await postgres_connection.delete_city_by_id(id)
+        return json.dumps(result, ensure_ascii=False)
+
+
+@app.route('/cities-test')
+async def post_by_id():
+    """
+
+    :return:
+    """
+    data = request.args
+    name = data.get('name', type=str)
+    longitude = data.get('longitude', type=float)
+    latitude = data.get('latitude', type=float)
+
+    result = await postgres_connection.post_city(name, longitude, latitude)
+    return json.dumps(result, ensure_ascii=False)
+
+@app.route('/cities-delete-test/<id>')
+async def delete_by_id(id):
+    result = await postgres_connection.delete_city_by_id(id)
+    return json.dumps(result, ensure_ascii=False)
 
 
 # %% companies
@@ -44,6 +70,7 @@ def companies():
 
     :return:
     """
+    data = request.get_json()
     if request.method == 'GET':
         return "GET"
     else:
@@ -51,12 +78,11 @@ def companies():
 
 
 @app.route('/companies/<id>', methods=['DELETE', 'GET'])
-def companies(id):
+def companies_by_id(id):
     """
 
     :return:
     """
-    # id = request.args.get('id')
     if request.method == 'GET':
         return "GET"
     else:
@@ -69,7 +95,6 @@ def companies_by_city_id(city_id):
 
     :return:
     """
-    # id = request.args.get('id')
     return "GET " + str(city_id)
 
 
@@ -80,6 +105,7 @@ def gas_analyzers():
 
     :return:
     """
+    data = request.get_json()
     if request.method == 'GET':
         return "GET"
     else:
@@ -87,12 +113,11 @@ def gas_analyzers():
 
 
 @app.route('/gas_analyzers/<measurement>', methods=['DELETE', 'GET'])
-def gas_analyzers(measurement):
+def gas_analyzers_by_id(measurement):
     """
 
     :return:
     """
-    # id = request.args.get('measurement')
     if request.method == 'GET':
         return "GET"
     else:
@@ -105,7 +130,6 @@ def gas_analyzers_by_city_id(city_id):
 
     :return:
     """
-    # id = request.args.get('id')
     return "GET " + str(city_id)
 
 
@@ -116,6 +140,7 @@ def pipes():
 
     :return:
     """
+    data = request.get_json()
     if request.method == 'GET':
         return "GET"
     else:
@@ -123,12 +148,11 @@ def pipes():
 
 
 @app.route('/pipes/<measurement>', methods=['DELETE', 'GET'])
-def pipes(measurement):
+def pipes_by_id(measurement):
     """
 
     :return:
     """
-    # id = request.args.get('measurement')
     if request.method == 'GET':
         return "GET"
     else:
@@ -141,7 +165,6 @@ def pipes_by_companies_id(company_id):
 
     :return:
     """
-    # id = request.args.get('id')
     return "GET " + str(company_id)
 
 
