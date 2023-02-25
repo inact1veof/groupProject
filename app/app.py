@@ -1,6 +1,6 @@
 import json
 
-from flask import Flask, jsonify, request
+from flask import Flask, jsonify, request, Response
 
 from connections.influx_connection import InfluxConnection
 from connections.postgres_connection import PostgresConnection
@@ -15,39 +15,35 @@ logger = get_logger(__name__)
 
 # %% cities
 @app.route('/cities', methods=['POST', 'GET'])
-async def cities():
+async def cities() -> str:
     """
-
-    :return:
+    Обрабатывает POST и GET запросы /cities
+    :return: str
     """
     if request.method == 'GET':
-        result = await postgres_connection.get_cities()
-        return json.dumps(result, ensure_ascii=False)
+        return await postgres_connection.get_cities()
     elif request.method == 'POST':
         data = request.get_json()
-        result = await postgres_connection.post_city(data)
-        return result
+        return await postgres_connection.post_city(data)
 
 
 @app.route('/cities/<id>', methods=['DELETE', 'GET'])
-async def cities_by_id(id):
+async def cities_by_id(id: int) -> str:
     """
-
-    :return:
+    Обрабатывает DELETE и GET запросы /cities/<id>
+    :return: str
     """
     if request.method == 'GET':
-        result = await postgres_connection.get_city_by_id(id)
-        return json.dumps(result, ensure_ascii=False)
+        return await postgres_connection.get_city_by_id(id)
     elif request.method == "DELETE":
-        result = await postgres_connection.delete_city_by_id(id)
-        return json.dumps(result, ensure_ascii=False)
+        return await postgres_connection.delete_city_by_id(id)
 
 
 @app.route('/cities-test')
-async def post_by_id():
+async def post_by_id() -> str:
     """
-
-    :return:
+    Обрабатывает GET запрос /cities-test
+    :return: str
     """
     data = request.args
     name = data.get('name', type=str)
@@ -57,115 +53,119 @@ async def post_by_id():
     result = await postgres_connection.post_city(name, longitude, latitude)
     return json.dumps(result, ensure_ascii=False)
 
+
 @app.route('/cities-delete-test/<id>')
-async def delete_by_id(id):
-    result = await postgres_connection.delete_city_by_id(id)
-    return json.dumps(result, ensure_ascii=False)
+async def delete_by_id(id: int) -> str:
+    """
+    Обрабатывает DELETE запрос /cities-delete-test/{id}
+    :return: str
+    """
+    return await postgres_connection.delete_city_by_id(id)
 
 
 # %% companies
 @app.route('/companies', methods=['POST', 'GET'])
-def companies():
+async def companies() -> str:
     """
-
-    :return:
+    Обрабатывает POST и GET запросы /companies
+    :return: str
     """
-    data = request.get_json()
     if request.method == 'GET':
-        return "GET"
-    else:
-        return "POST"
+        return await postgres_connection.get_companies()
+    elif request.method == 'POST':
+        data = request.get_json()
+        return await postgres_connection.post_company(data)
 
 
 @app.route('/companies/<id>', methods=['DELETE', 'GET'])
-def companies_by_id(id):
+async def companies_by_id(id: int) -> str:
     """
-
-    :return:
+    Обрабатывает DELETE и GET запросы /companies/{id}
+    :return: str
     """
     if request.method == 'GET':
-        return "GET"
-    else:
-        return "DELETE"
+        return await postgres_connection.get_company_by_id(id)
+    elif request.method == "DELETE":
+        return await postgres_connection.delete_company_by_id(id)
 
 
 @app.route('/companies/city/<city_id>', methods=['GET'])
-def companies_by_city_id(city_id):
+async def companies_by_city_id(city_id: int):
     """
-
+    Обрабатывает GET запрос /companies/city/{city_id}
     :return:
     """
-    return "GET " + str(city_id)
+    return await postgres_connection.get_companies_by_city_id(city_id)
 
 
 # %% gas_analyzers
 @app.route('/gas_analyzers', methods=['POST', 'GET'])
-def gas_analyzers():
+async def gas_analyzers() -> str:
     """
-
-    :return:
-    """
-    data = request.get_json()
-    if request.method == 'GET':
-        return "GET"
-    else:
-        return "POST"
-
-
-@app.route('/gas_analyzers/<measurement>', methods=['DELETE', 'GET'])
-def gas_analyzers_by_id(measurement):
-    """
-
-    :return:
+    Обрабатывает POST и GET запросы /gas_analyzers
+    :return: str
     """
     if request.method == 'GET':
-        return "GET"
-    else:
-        return "DELETE"
+        return await postgres_connection.get_gas_analyzers()
+    elif request.method == 'POST':
+        data = request.get_json()
+        return await postgres_connection.post_gas_analyzer(data)
+
+
+@app.route('/gas_analyzers/<id>', methods=['DELETE', 'GET'])
+async def gas_analyzers_by_id(id: int) -> str:
+    """
+    Обрабатывает DELETE и GET запросы /gas_analyzers/{id}
+    :return: str
+    """
+    if request.method == 'GET':
+        return await postgres_connection.get_gas_analyzer_by_id(id)
+    elif request.method == "DELETE":
+        return await postgres_connection.delete_gas_analyzer_by_id(id)
 
 
 @app.route('/gas_analyzers/city/<city_id>', methods=['GET'])
-def gas_analyzers_by_city_id(city_id):
+async def gas_analyzers_by_city_id(city_id: int):
     """
-
+    Обрабатывает GET запрос /gas_analyzers/city/{city_id}
     :return:
     """
-    return "GET " + str(city_id)
+    return await postgres_connection.get_gas_analyzers_by_city_id(city_id)
 
 
 # %% pipes
 @app.route('/pipes', methods=['POST', 'GET'])
-def pipes():
+async def gas_analyzers() -> str:
     """
-
-    :return:
-    """
-    data = request.get_json()
-    if request.method == 'GET':
-        return "GET"
-    else:
-        return "POST"
-
-
-@app.route('/pipes/<measurement>', methods=['DELETE', 'GET'])
-def pipes_by_id(measurement):
-    """
-
-    :return:
+    Обрабатывает POST и GET запросы /pipes
+    :return: str
     """
     if request.method == 'GET':
-        return "GET"
-    else:
-        return "DELETE"
+        return await postgres_connection.get_pipes()
+    elif request.method == 'POST':
+        data = request.get_json()
+        return await postgres_connection.post_pipe(data)
+
+
+@app.route('/pipes/<id>', methods=['DELETE', 'GET'])
+async def pipes_by_id(id: int) -> str:
+    """
+    Обрабатывает DELETE и GET запросы /pipes/<id>
+    :return: str
+    """
+    if request.method == 'GET':
+        return await postgres_connection.get_pipe_by_id(id)
+    elif request.method == "DELETE":
+        return await postgres_connection.delete_pipe_by_id(id)
 
 
 @app.route('/pipes/company/<company_id>', methods=['GET'])
-def pipes_by_companies_id(company_id):
+async def pipes_by_company_id(company_id: int):
     """
-
+    Обрабатывает GET запрос /pipes/company/<company_id>
     :return:
     """
-    return "GET " + str(company_id)
+    return await postgres_connection.get_pipes_by_company_id(company_id)
 
 
 # %%
