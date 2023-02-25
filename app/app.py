@@ -135,7 +135,7 @@ async def gas_analyzers_by_city_id(city_id: int):
 
 # %% pipes
 @app.route('/pipes', methods=['POST', 'GET'])
-async def gas_analyzers() -> str:
+async def gas_pipes() -> str:
     """
     Обрабатывает POST и GET запросы /pipes
     :return: str
