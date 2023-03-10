@@ -168,20 +168,31 @@ async def pipes_by_company_id(company_id: int):
     return await postgres_connection.get_pipes_by_company_id(company_id)
 
 
-# %%
+# %% influx
+@app.route('/influx/data', methods=['GET', 'POST'])
+async def data_from_influx():
+    if request.method == 'GET':
+        measurement = request.args.get('measurement')
+        date_from = request.args.get('date_from')
+        date_to = request.args.get('date_to')
+        return await influx_connection.read_data_from_influx(measurement, date_from, date_to)
+    elif request.method == 'POST':
+        measurement = request.args.get('measurement')
+        value = request.args.get('value')
+        return await influx_connection.write_data_to_influx(measurement, value)
+
+
+# %% hello_world
 @app.route('/')
 def hello_world():  # put application's code here
-    return 'Helloddd!'
+    return 'Hello World!'
 
-
-@app.route('/items')
-async def items():
-    data = await postgres_connection.get_items()
-    return jsonify(data)
+def get_connections():
+    influx_connection.conncet()
+    postgres_connection.conncet()
 
 
 if __name__ == '__main__':
     logger.info("--------- Старт сервера ---------")
-    influx_connection.conncet()
-    postgres_connection.conncet()
+    get_connections()
     app.run(host='0.0.0.0', port=8000, debug=False, use_reloader=False)

@@ -1,5 +1,7 @@
 version: '3.8'
 services:
+
+    # postgres база данных
     db:
         image: postgres:14.1-alpine
         container_name: postgresdb
@@ -12,8 +14,9 @@ services:
             - 5432:5432
         volumes:
             - db:/var/lib/postgresql/data
-#            - ./db/init.sql:/docker-entrypoint-initdb.d/create_tables.sql
             - ./db/damp.sql:/docker-entrypoint-initdb.d/create_tables.sql
+
+    # influxdb временной ряд
     influxdb:
         image: influxdb:2.6-alpine
         container_name: influxdb2
@@ -27,10 +30,12 @@ services:
             DOCKER_INFLUXDB_INIT_ADMIN_TOKEN:   ${DOCKER_INFLUXDB_INIT_ADMIN_TOKEN}
         volumes:
             - influxdbv2:/var/lib/influxdb2:rw
-            - ./db/influx_db/pollution.csv:/bin/pollution.csv
+            - ./db/influx_db/PM10.csv:/bin/PM10.csv
             - ./db/influx_db/influx_init.sh:/docker-entrypoint-initdb.d/influx_init.sh
+        hostname: influxdb
         ports:
             - 8086:8086
+    # сервис основного приложения
     web-app:
         container_name: web-app-api
         build:
@@ -50,6 +55,8 @@ services:
         volumes:
             -   ./app:/app
         working_dir: /app/
+
+    # сервис администрации postgres
     admin:
         image: adminer
         restart: always
@@ -57,11 +64,15 @@ services:
             - db
         ports:
             - 8080:8080
+
+    # сервис для редактирования swagger документации
     swagger-editor:
         image: swaggerapi/swagger-editor
         container_name: "swagger-editor-container"
         ports:
             - "8081:8080"
+
+    # сервис для swagger документации
     swagger-ui:
         image: swaggerapi/swagger-ui
         container_name: "swagger-ui-container"
@@ -71,6 +82,7 @@ services:
             - ./swagger/swagger.yml:/swagger.yml
         environment:
             SWAGGER_JSON: /swagger.yml
+
 volumes:
     db:
         driver: local

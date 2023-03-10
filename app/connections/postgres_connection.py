@@ -1,5 +1,6 @@
 import json
 import psycopg2
+import time
 
 from logger import get_logger
 from settings import postgres_config
@@ -20,18 +21,21 @@ class PostgresConnection(BaseConnection):
 
         :return: None
         """
-        try:
-            self.connection = psycopg2.connect(
-                host=postgres_config["DB_HOST"],
-                port=postgres_config["DB_PORT"],
-                user=postgres_config["POSTGRES_USER"],
-                password=postgres_config["POSTGRES_PASSWORD"],
-                database=postgres_config["POSTGRES_DB"]
-            )
-            self.connection.autocommit = True
-            logger.info("--------- Соединение c Postgres установлено: %s ----------", self.connection)
-        except Exception as _ex:
-            logger.info("--------- Соединение c Postgres не установлено: %s ---------", _ex)
+        while(True):
+            try:
+                self.connection = psycopg2.connect(
+                    host=postgres_config["DB_HOST"],
+                    port=postgres_config["DB_PORT"],
+                    user=postgres_config["POSTGRES_USER"],
+                    password=postgres_config["POSTGRES_PASSWORD"],
+                    database=postgres_config["POSTGRES_DB"]
+                )
+                self.connection.autocommit = True
+                logger.info("--------- Соединение c Postgres установлено: %s ----------", self.connection)
+                return
+            except Exception as _ex:
+                logger.info("--------- Соединение c Postgres не установлено: %s ---------", _ex)
+                time.sleep(1)
 
 # %% cities
     async def get_cities(self) -> str:
@@ -424,11 +428,3 @@ class PostgresConnection(BaseConnection):
             "code": int(code),
             "message": str(message)
         }
-
-    async def get_items(self) -> str:
-        with self.connection.cursor() as cursor:
-            cursor.execute(
-                "SELECT * FROM quote;"
-            )
-            msg = cursor.fetchall()
-            return msg

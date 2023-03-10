@@ -12,6 +12,7 @@ psycopg2-binary
 
 # работа с influx
 influxdb
+influxdb_client
 
 # валидация данных
 pydantic>=1.10.1,<1.11.10
