@@ -25,6 +25,15 @@ influx_config = dict(
         "DOCKER_INFLUXDB_INIT_ADMIN_TOKEN","mytoken")
 )
 
+cron_config = dict(
+    CRON_POSTGRES_USER = os.getenv(
+        "CRON_POSTGRES_USER","mycron"
+    ),
+    CRON_POSTGRES_VALUE = os.getenv(
+        "CRON_POSTGRES_VALUE","mycronpassword"
+    )
+)
+
 # logging variables
 LOGGING_PATH: str = os.getenv("LOGGING_PATH", "logs")
 

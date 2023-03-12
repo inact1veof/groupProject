@@ -10,11 +10,14 @@ services:
             POSTGRES_USER:      ${POSTGRES_USER}
             POSTGRES_PASSWORD:  ${POSTGRES_PASSWORD}
             POSTGRES_DB:        ${POSTGRES_DB}
+            CRON_POSTGRES_USER: ${CRON_POSTGRES_USER}
+            CRON_POSTGRES_VALUE: ${CRON_POSTGRES_VALUE}
         ports:
             - 5432:5432
         volumes:
             - db:/var/lib/postgresql/data
             - ./db/damp.sql:/docker-entrypoint-initdb.d/create_tables.sql
+            - ./db/init-user-db.sh:/docker-entrypoint-initdb.d/init-user-db.sh
 
     # influxdb временной ряд
     influxdb:
@@ -35,6 +38,7 @@ services:
         hostname: influxdb
         ports:
             - 8086:8086
+
     # сервис основного приложения
     web-app:
         container_name: web-app-api
@@ -55,6 +59,16 @@ services:
         volumes:
             -   ./app:/app
         working_dir: /app/
+
+    # сервис для выполнения периодического задания
+    cron:
+        build: .
+        image: wheather-directory-cron
+        env_file:
+            - .env
+        volumes:
+            - ./app:/app
+        entrypoint: sh /app/cron/crontab.sh
 
     # сервис администрации postgres
     admin:

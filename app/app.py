@@ -1,6 +1,9 @@
+import datetime
 import json
 
 from flask import Flask, jsonify, request, Response
+from flask_cors import CORS, cross_origin
+
 
 from connections.influx_connection import InfluxConnection
 from connections.postgres_connection import PostgresConnection
@@ -10,6 +13,8 @@ postgres_connection = PostgresConnection()
 influx_connection = InfluxConnection()
 
 app = Flask(__name__)
+cors = CORS(app)
+app.config['CORS_HEADERS'] = 'Content-Type'
 logger = get_logger(__name__)
 
 
@@ -20,6 +25,7 @@ async def cities() -> str:
     Обрабатывает POST и GET запросы /cities
     :return: str
     """
+    check_postgres_connection()
     if request.method == 'GET':
         return await postgres_connection.get_cities()
     elif request.method == 'POST':
@@ -33,34 +39,12 @@ async def cities_by_id(id: int) -> str:
     Обрабатывает DELETE и GET запросы /cities/<id>
     :return: str
     """
+    check_postgres_connection()
+
     if request.method == 'GET':
         return await postgres_connection.get_city_by_id(id)
     elif request.method == "DELETE":
         return await postgres_connection.delete_city_by_id(id)
-
-
-@app.route('/cities-test')
-async def post_by_id() -> str:
-    """
-    Обрабатывает GET запрос /cities-test
-    :return: str
-    """
-    data = request.args
-    name = data.get('name', type=str)
-    longitude = data.get('longitude', type=float)
-    latitude = data.get('latitude', type=float)
-
-    result = await postgres_connection.post_city(name, longitude, latitude)
-    return json.dumps(result, ensure_ascii=False)
-
-
-@app.route('/cities-delete-test/<id>')
-async def delete_by_id(id: int) -> str:
-    """
-    Обрабатывает DELETE запрос /cities-delete-test/{id}
-    :return: str
-    """
-    return await postgres_connection.delete_city_by_id(id)
 
 
 # %% companies
@@ -70,6 +54,8 @@ async def companies() -> str:
     Обрабатывает POST и GET запросы /companies
     :return: str
     """
+    check_postgres_connection()
+
     if request.method == 'GET':
         return await postgres_connection.get_companies()
     elif request.method == 'POST':
@@ -83,6 +69,8 @@ async def companies_by_id(id: int) -> str:
     Обрабатывает DELETE и GET запросы /companies/{id}
     :return: str
     """
+    check_postgres_connection()
+
     if request.method == 'GET':
         return await postgres_connection.get_company_by_id(id)
     elif request.method == "DELETE":
@@ -95,6 +83,8 @@ async def companies_by_city_id(city_id: int):
     Обрабатывает GET запрос /companies/city/{city_id}
     :return:
     """
+    check_postgres_connection()
+
     return await postgres_connection.get_companies_by_city_id(city_id)
 
 
@@ -105,6 +95,8 @@ async def gas_analyzers() -> str:
     Обрабатывает POST и GET запросы /gas_analyzers
     :return: str
     """
+    check_postgres_connection()
+
     if request.method == 'GET':
         return await postgres_connection.get_gas_analyzers()
     elif request.method == 'POST':
@@ -118,6 +110,8 @@ async def gas_analyzers_by_id(id: int) -> str:
     Обрабатывает DELETE и GET запросы /gas_analyzers/{id}
     :return: str
     """
+    check_postgres_connection()
+
     if request.method == 'GET':
         return await postgres_connection.get_gas_analyzer_by_id(id)
     elif request.method == "DELETE":
@@ -130,6 +124,8 @@ async def gas_analyzers_by_city_id(city_id: int):
     Обрабатывает GET запрос /gas_analyzers/city/{city_id}
     :return:
     """
+    check_postgres_connection()
+
     return await postgres_connection.get_gas_analyzers_by_city_id(city_id)
 
 
@@ -140,6 +136,8 @@ async def gas_pipes() -> str:
     Обрабатывает POST и GET запросы /pipes
     :return: str
     """
+    check_postgres_connection()
+
     if request.method == 'GET':
         return await postgres_connection.get_pipes()
     elif request.method == 'POST':
@@ -153,6 +151,8 @@ async def pipes_by_id(id: int) -> str:
     Обрабатывает DELETE и GET запросы /pipes/<id>
     :return: str
     """
+    check_postgres_connection()
+
     if request.method == 'GET':
         return await postgres_connection.get_pipe_by_id(id)
     elif request.method == "DELETE":
@@ -165,27 +165,46 @@ async def pipes_by_company_id(company_id: int):
     Обрабатывает GET запрос /pipes/company/<company_id>
     :return:
     """
+    check_postgres_connection()
+
     return await postgres_connection.get_pipes_by_company_id(company_id)
 
 
 # %% influx
 @app.route('/influx/data', methods=['GET', 'POST'])
 async def data_from_influx():
+    check_influx_connection()
+
     if request.method == 'GET':
         measurement = request.args.get('measurement')
         date_from = request.args.get('date_from')
         date_to = request.args.get('date_to')
-        return await influx_connection.read_data_from_influx(measurement, date_from, date_to)
+        if date_to is None:
+            date_to = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        return await influx_connection.read_gas_analyzer_data_from_influx(measurement, date_from, date_to)
     elif request.method == 'POST':
         measurement = request.args.get('measurement')
         value = request.args.get('value')
-        return await influx_connection.write_data_to_influx(measurement, value)
+        return await influx_connection.write_gas_analyzer_data_to_influx(measurement, float(value))
 
 
 # %% hello_world
 @app.route('/')
 def hello_world():  # put application's code here
     return 'Hello World!'
+
+
+def check_postgres_connection():
+    if postgres_connection.connection.closed != 0:
+        logger.info("--------- Соединение c Postgres потеряно возобновляем соединение ----------")
+        postgres_connection.connection()
+
+
+def check_influx_connection():
+    if not influx_connection.connection.ping():
+        logger.info("--------- Соединение c Influx потеряно возобновляем соединение ----------")
+        influx_connection.conncet()
+
 
 def get_connections():
     influx_connection.conncet()

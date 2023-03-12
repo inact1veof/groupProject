@@ -35,7 +35,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/City"
+              $ref: "#/components/schemas/CityPost"
       responses:
         '200':
           description: Successful creation of the city
@@ -254,7 +254,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/Company"
+              $ref: "#/components/schemas/CompanyPost"
       responses:
         '200':
           description: Successful creation of the company
@@ -470,6 +470,84 @@ paths:
               schema:
                 $ref: "#/components/schemas/Error"
 
+
+  /influx/data:
+    get:
+      summary: The method of obtaining a data of gas analyzer
+      tags:
+        - Influx Data
+      operationId: getGasAnalyzerData
+      parameters:
+        - name: measurement
+          in: query
+          required: true
+          description: Gas Analyzer Measurement
+          schema:
+            type: string
+          example: Gaz_Analyzer_1
+        - name: date_from
+          in: query
+          required: true
+          description: Data from
+          schema:
+            type: string
+          example: "2022-01-01 00:00:00"
+        - name: date_to
+          in: query
+          required: false
+          description: Data to
+          schema:
+            type: string
+          example: "2022-01-04 00:00:00"
+      responses:
+        '200':
+          description: Getting a list of Gas Analyzer data
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GasAnalyzerDatas"
+        'default':
+          description: Something is wrong
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+    post:
+      summary: The method of creating data of gas analyzer
+      tags:
+        - Influx Data
+      operationId: postGasAnalyzerData
+      parameters:
+        - name: measurement
+          in: query
+          required: true
+          description: Gas Analyzer Measurement
+          schema:
+            type: string
+          example: Gaz_Analyzer_1
+        - name: value
+          in: query
+          required: true
+          description: Gas Analyzer Value
+          schema:
+            type: number
+          example: 0.2
+      responses:
+        '200':
+          description: Successful creation of the data
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Success"
+        'default':
+          description: Something is wrong
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+
+
 components:
   schemas:
     City:
@@ -492,6 +570,23 @@ components:
           type: number
           example: 56.266792
 
+    CityPost:
+      type: object
+      required:
+        - name
+        - longitude
+        - latitude
+      properties:
+        name:
+          type: string
+          example: Perm
+        latitude:
+          type: number
+          example: 58.029682
+        longitude:
+          type: number
+          example: 56.266792
+
 
     Cities:
       type: array
@@ -504,13 +599,41 @@ components:
       required:
         - city_id
         - name
-        - sanitary_zone_radius_m
+        - sanitary_zone_radius
         - longitude
         - latitude
       properties:
         id:
           type: integer
           example: 99
+        city_id:
+          type: integer
+          example: 13
+        name:
+          type: string
+          example: Company-1
+        sanitary_zone_radius_m:
+          type: number
+          example: 100
+        latitude:
+          type: number
+          example: 58.029682
+        longitude:
+          type: number
+          example: 56.266792
+        description:
+          type: string
+          example: Some description
+
+    CompanyPost:
+      type: object
+      required:
+        - city_id
+        - name
+        - sanitary_zone_radius
+        - longitude
+        - latitude
+      properties:
         city_id:
           type: integer
           example: 13
@@ -540,6 +663,7 @@ components:
     Pipe:
       type: object
       required:
+        - measurement
         - company_id
         - longitude
         - latitude
@@ -567,6 +691,7 @@ components:
     GasAnalyzer:
       type: object
       required:
+        - measurement
         - city_id
         - longitude
         - latitude
@@ -593,6 +718,49 @@ components:
       type: array
       items:
         $ref: "#/components/schemas/GasAnalyzer"
+
+
+    GasAnalyzerData:
+      type: object
+      required:
+        - _measurement
+        - _time
+        - _value
+      properties:
+        result:
+          type: string
+          example: "_result"
+        table:
+          type: integer
+          example: 0
+        _measurement:
+          type: string
+          example: "Gaz_Analyzer_1"
+        _time:
+          type: string
+          example: "2022-01-02T05:00:18+00:00"
+        _value:
+          type: number
+          example: 0.1
+
+    GasAnalyzerDatas:
+      type: array
+      items:
+        $ref: "#/components/schemas/GasAnalyzerData"
+
+
+    Success:
+     type: object
+     required:
+      - code
+      - message
+     properties:
+      code:
+        type: integer
+        example: 200
+      message:
+        type: string
+        example: "success"
 
 
     Error:

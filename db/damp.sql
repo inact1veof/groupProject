@@ -1,4 +1,4 @@
-set client_encoding='win1251';
+set client_encoding = 'UTF8';
 
 CREATE SEQUENCE "city_id_seq" INCREMENT 1 MINVALUE 1 MAXVALUE 2147483647 CACHE 1;
 

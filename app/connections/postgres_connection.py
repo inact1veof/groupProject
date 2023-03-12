@@ -50,7 +50,7 @@ class PostgresConnection(BaseConnection):
                 )
                 return json.dumps(cursor.fetchall()[0][0], ensure_ascii=False)
         except Exception as _ex:
-            return json.dumps(self.assemble_message(0, _ex))
+            return json.dumps(self.assemble_message(0, _ex), ensure_ascii=False)
 
     async def post_city(self, data: dict) -> str:
         """
@@ -71,7 +71,7 @@ class PostgresConnection(BaseConnection):
                         "latitude": float(data["latitude"])
                         }, ensure_ascii=False)
         except Exception as _ex:
-            return json.dumps(self.assemble_message(0, _ex))
+            return json.dumps(self.assemble_message(0, _ex), ensure_ascii=False)
 
     async def get_city_by_id(self, id: int) -> str:
         """
@@ -87,7 +87,7 @@ class PostgresConnection(BaseConnection):
                 )
                 return json.dumps(cur.fetchone()[0][0], ensure_ascii=False)
         except Exception as _ex:
-            return json.dumps(self.assemble_message(0, _ex))
+            return json.dumps(self.assemble_message(0, _ex), ensure_ascii=False)
 
     async def delete_city_by_id(self, id: int) -> str:
         """
@@ -109,29 +109,6 @@ class PostgresConnection(BaseConnection):
         except Exception as _ex:
             return json.dumps(self.assemble_message(0, _ex), ensure_ascii=False)
 
-    async def post_city(self, n, long, lat) -> dict:
-        """
-        Добавляет город в таблице
-        :return: dict
-        """
-        try:
-            with self.connection.cursor() as cur:
-                cur.execute(
-                    "INSERT INTO City (name, longitude, latitude) VALUES (%s, %s, %s) RETURNING id",
-                    (n, long, lat)
-                )
-                result = cur.fetchone()[0]
-                return {
-                        "id": int(result),
-                        "name": str(n),
-                        "longitude": float(long),
-                        "latitude": float(lat)
-                        }
-        except Exception as _ex:
-            return {
-                    "code": str(0),
-                    "message": str(_ex)
-                    }
 
 # %% companies
     async def get_companies(self) -> str:
