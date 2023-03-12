@@ -11,6 +11,7 @@ ENV ENV=${ENV} \
 
 RUN apt-get update && apt-get install -y \
     build-essential \
+    cron \
     # Cleaning cache:
     && apt-get purge -y --auto-remove -o APT::AutoRemove::RecommendsImportant=false \
     && apt-get clean -y && rm -rf /var/lib/apt/lists/*
@@ -19,8 +20,11 @@ COPY ./requirements.txt /
 
 RUN --mount=type=cache,target=/root/.cache/pip \
     pip install --upgrade pip -r requirements.txt
+
 ADD ./app /app
 WORKDIR /app
+
+USER root
 
 ENTRYPOINT ["python3"]
 CMD ["app.py"]
