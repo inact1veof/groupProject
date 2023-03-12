@@ -5,7 +5,7 @@ from influxdb import InfluxDBClient
 import influxdb_client
 from influxdb_client import Point
 from influxdb_client.client.write_api import SYNCHRONOUS
-from influxdb_client.client.flux_table import FluxStructureEncoder
+from influxdb_client.client.flux_table import FluxStructureEncoder, TableList
 import time
 
 from logger import get_logger
@@ -49,10 +49,9 @@ class InfluxConnection(BaseConnection):
         query = f"""
                     from(bucket: "{self.bucket}")
                     |> range(start: _dateFrom, stop: _dateTo)
-                    |> filter(fn: (r) => r["_time"] >= _dateFrom and r["_time"] <= _dateTo)  
                     |> filter(fn: (r) => r["_measurement"] == _myM)
-                    |> filter(fn: (r) => r["_field"] == "value")
-                    |> keep(columns: ["_time","_value", "_measurement"])
+                    |> pivot(rowKey:["_time"], columnKey: ["_field"], valueColumn: "_value")
+                    |> keep(columns: ["_time","value", "_measurement"])
                 """
 
         param = {
@@ -63,7 +62,10 @@ class InfluxConnection(BaseConnection):
 
         try:
             response = self.query_api.query(query=query, params=param)
-            output = response.to_json(indent=5)
+            output = response.to_json(columns=['_measurement',
+                                               '_time',
+                                               'value'],
+                                      indent=5)
             return output
         except Exception as _ex:
             return json.dumps({
@@ -71,7 +73,41 @@ class InfluxConnection(BaseConnection):
                 "message": str(_ex)
                 }, ensure_ascii=False)
 
-    async def write_gas_analyzer_data_to_influx(self, measurement: str, value: float):
+    async def read_weather_data_from_influx(self, measurement: str,
+                                              date_from: str,
+                                              date_to: str):
+
+        query = f"""
+                    from(bucket: "{self.bucket}")
+                    |> range(start: _dateFrom, stop: _dateTo)
+                    |> filter(fn: (r) => r["_measurement"] == _myM)
+                    |> pivot(rowKey:["_time"], columnKey: ["_field"], valueColumn: "_value")
+                    |> keep(columns: ["_time","temperature", "weathercode", "winddirection", "windspeed", "_measurement"])
+                """
+
+        param = {
+                "_myM": str(measurement),
+                "_dateFrom": datetime.datetime.strptime(date_from, "%Y-%m-%d %H:%M:%S"),
+                "_dateTo": datetime.datetime.strptime(date_to, "%Y-%m-%d %H:%M:%S")
+        }
+
+        try:
+            response = self.query_api.query(query=query, params=param)
+            output = response.to_json(columns=["_measurement",
+                                               "_time",
+                                               "temperature",
+                                               "weathercode",
+                                               "winddirection",
+                                               "windspeed"],
+                                      indent=5)
+            return output
+        except Exception as _ex:
+            return json.dumps({
+                "code": int(40),
+                "message": str(_ex)
+                }, ensure_ascii=False)
+
+    async def write_data_to_influx(self, measurement: str, value: float):
 
         point = influxdb_client.Point(measurement).field("value", value)
         try:
