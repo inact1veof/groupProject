@@ -471,7 +471,7 @@ paths:
                 $ref: "#/components/schemas/Error"
 
 
-  /influx/data:
+  /influx/gas_analyzer:
     get:
       summary: The method of obtaining a data of gas analyzer
       tags:
@@ -512,11 +512,53 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Error"
+  /influx/weather:
+    get:
+      summary: The method of obtaining a data of gas analyzer
+      tags:
+        - Influx Data
+      operationId: getWeatherData
+      parameters:
+        - name: measurement
+          in: query
+          required: true
+          description: Weather Measurement
+          schema:
+            type: string
+          example: Perm
+        - name: date_from
+          in: query
+          required: true
+          description: Data from
+          schema:
+            type: string
+          example: "2022-01-01 00:00:00"
+        - name: date_to
+          in: query
+          required: false
+          description: Data to
+          schema:
+            type: string
+          example: "2022-01-04 00:00:00"
+      responses:
+        '200':
+          description: Getting a list of Gas Analyzer data
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/WeatherDatas"
+        'default':
+          description: Something is wrong
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  /influx/data:
     post:
       summary: The method of creating data of gas analyzer
       tags:
         - Influx Data
-      operationId: postGasAnalyzerData
+      operationId: postInfluxData
       parameters:
         - name: measurement
           in: query
@@ -545,6 +587,8 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Error"
+
+
 
 
 
@@ -723,23 +767,17 @@ components:
     GasAnalyzerData:
       type: object
       required:
-        - _measurement
         - _time
-        - _value
+        - _measurement
+        - value
       properties:
-        result:
-          type: string
-          example: "_result"
-        table:
-          type: integer
-          example: 0
-        _measurement:
-          type: string
-          example: "Gaz_Analyzer_1"
         _time:
           type: string
           example: "2022-01-02T05:00:18+00:00"
-        _value:
+        _measurement:
+          type: string
+          example: "Gaz_Analyzer_1"
+        value:
           type: number
           example: 0.1
 
@@ -747,6 +785,40 @@ components:
       type: array
       items:
         $ref: "#/components/schemas/GasAnalyzerData"
+
+    WeatherData:
+      type: object
+      required:
+        - _time
+        - _measurement
+        - temperature
+        - weathercode
+        - winddirection
+        - windspeed
+      properties:
+        _time:
+          type: string
+          example: "2023-03-12T09:41:02.971182+00:00"
+        _measurement:
+          type: string
+          example: "Perm"
+        temperature:
+          type: number
+          example: -4.7
+        weathercode:
+          type: integer
+          example: 3
+        winddirection:
+          type: number
+          example: 153.0
+        windspeed:
+          type: number
+          example: 4.47
+
+    WeatherDatas:
+      type: array
+      items:
+        $ref: "#/components/schemas/WeatherData"
 
 
     Success:

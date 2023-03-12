@@ -171,8 +171,18 @@ async def pipes_by_company_id(company_id: int):
 
 
 # %% influx
-@app.route('/influx/data', methods=['GET', 'POST'])
+@app.route('/influx/data', methods=['POST'])
 async def data_from_influx():
+    check_influx_connection()
+
+    if request.method == 'POST':
+        measurement = request.args.get('measurement')
+        value = request.args.get('value')
+        return await influx_connection.write_data_to_influx(measurement, float(value))
+
+
+@app.route('/influx/gas_analyzer', methods=['GET'])
+async def gas_analyzer_from_influx():
     check_influx_connection()
 
     if request.method == 'GET':
@@ -182,10 +192,19 @@ async def data_from_influx():
         if date_to is None:
             date_to = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         return await influx_connection.read_gas_analyzer_data_from_influx(measurement, date_from, date_to)
-    elif request.method == 'POST':
+
+
+@app.route('/influx/weather', methods=['GET'])
+async def weather_from_influx():
+    check_influx_connection()
+
+    if request.method == 'GET':
         measurement = request.args.get('measurement')
-        value = request.args.get('value')
-        return await influx_connection.write_gas_analyzer_data_to_influx(measurement, float(value))
+        date_from = request.args.get('date_from')
+        date_to = request.args.get('date_to')
+        if date_to is None:
+            date_to = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        return await influx_connection.read_weather_data_from_influx(measurement, date_from, date_to)
 
 
 # %% hello_world

@@ -12,7 +12,7 @@ CREATE TABLE "public"."city" (
 ) WITH (oids = false);
 
 INSERT INTO "city" ("name", "longitude", "latitude") VALUES
-('Пермь',	56.2502,	58.0105);
+('Perm',	56.2502,	58.0105);
 
 CREATE SEQUENCE "company_id_seq" INCREMENT 1 MINVALUE 1 MAXVALUE 2147483647 CACHE 1;
 
