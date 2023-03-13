@@ -6,6 +6,43 @@ servers:
   - url: http://localhost:8000
     description: web-app-api
 paths:
+  /calculate:
+    get:
+      summary: Calculate Data
+      tags:
+        - Calculate Data
+      operationId: getCalculatedData
+      parameters:
+        - name: longitude
+          in: query
+          required: true
+          description: Longitude
+          schema:
+            type: string
+          example: 57.99977
+        - name: latitude
+          in: query
+          required: true
+          description: Latitude
+          schema:
+            type: number
+          example: 57.99977
+        - name: winddirection
+          in: query
+          required: true
+          description: WindDirection
+          schema:
+            type: number
+          example: 270
+      responses:
+        'default':
+          description: Something is wrong
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+
   /cities:
     get:
       summary: The method of obtaining a list of cities

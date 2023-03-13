@@ -213,6 +213,28 @@ def hello_world():  # put application's code here
     return 'Hello World!'
 
 
+@app.route('/calculate', methods=['GET'])
+async def calculate_heatmap():
+    check_influx_connection()
+
+    if request.method == 'GET':
+        longitude = float(request.args.get('longitude'))
+        latitude = float(request.args.get('latitude'))
+        winddirection = float(request.args.get('winddirection'))
+        return await calculation(longitude, latitude, winddirection)
+
+
+async def calculation(longitude: float, latitude: float, winddirection: float):
+    """
+    Ждем код от Мишы
+    """
+
+    return json.dumps({
+                "code": int(40),
+                "message": str("Doesn't implement yet")
+                }, ensure_ascii=False)
+
+
 def check_postgres_connection():
     if postgres_connection.connection.closed != 0:
         logger.info("--------- Соединение c Postgres потеряно возобновляем соединение ----------")

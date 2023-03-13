@@ -129,10 +129,7 @@ class InfluxConnection(BaseConnection):
         point = influxdb_client.Point(measurement)\
             .field("latitude", data["latitude"])\
             .field("longitude", data["longitude"])\
-            .field("temperature", data["temperature"])\
-            .field("windspeed", data["windspeed"])\
-            .field("winddirection", data["winddirection"])\
-            .field("weathercode", data["weathercode"])
+            .field("value", data["value"])
         try:
             self.write_api.write(bucket=self.bucket,
                                 org=influx_config["DOCKER_INFLUXDB_INIT_ORG"],
