@@ -262,16 +262,16 @@ class PostgresConnection(BaseConnection):
         except Exception as _ex:
             return json.dumps(self.assemble_message(20, _ex), ensure_ascii=False)
 
-    async def delete_gas_analyzer_by_id(self, id: int) -> str:
+    async def delete_gas_analyzer_by_id(self, measurement: str) -> str:
         """
         Удаляет из базы данных газоанализатор по заданному id
-        :param id:
+        :param measurement:
         :return:
         """
         try:
             with self.connection.cursor() as cur:
                 cur.execute(
-                    "DELETE FROM Gas_analyzer WHERE id = %s", (id,)
+                    "DELETE FROM Gas_analyzer WHERE measurement = %s", (measurement,)
                 )
                 if cur.rowcount == 1:
                     return json.dumps(self.assemble_message(200, "Successful deletion of the gas analyzer"),
@@ -397,6 +397,61 @@ class PostgresConnection(BaseConnection):
                                       ensure_ascii=False)
         except Exception as _ex:
             return json.dumps(self.assemble_message(30, _ex), ensure_ascii=False)
+
+    async def get_guide(self) -> str:
+        """
+        Возвращает все вещества из таблицы
+        :return: dict
+        """
+        try:
+            with self.connection.cursor() as cursor:
+                cursor.execute(
+                    "SELECT array_to_json(array_agg(row_to_json (r))) FROM ( SELECT * FROM Guide) r;"
+                )
+                return json.dumps(cursor.fetchall()[0][0], ensure_ascii=False)
+        except Exception as _ex:
+            return json.dumps(self.assemble_message(0, _ex), ensure_ascii=False)
+
+    async def post_guide(self, data: dict) -> str:
+        """
+        Добавляет вещество в таблицу
+        :return: str
+        """
+        try:
+            with self.connection.cursor() as cursor:
+                cursor.execute(
+                    "INSERT INTO Guide (substance_name, pdk_mr, pdk_ss)"
+                    "VALUES (%s, %s, %s)",
+                    (data["substance_name"], data["pdk_mr"],
+                     data["pdk_ss"])
+                )
+                return json.dumps({
+                    "substance_name": str(data["substance_name"]),
+                    "pdk_mr": float(data["pdk_mr"]),
+                    "pdk_ss": float(data["pdk_ss"])
+                    }, ensure_ascii=False)
+        except Exception as _ex:
+            return json.dumps(self.assemble_message(20, _ex), ensure_ascii=False)
+
+    async def delete_guide_record_by_id(self, id: int) -> str:
+        """
+        Удаляет из базы данных вещество по заданному id
+        :param id:
+        :return:
+        """
+        try:
+            with self.connection.cursor() as cur:
+                cur.execute(
+                    "DELETE FROM Guide WHERE id = %s", (id,)
+                )
+                if cur.rowcount == 1:
+                    return json.dumps(self.assemble_message(200, "Successful deletion of the record"),
+                                      ensure_ascii=False)
+                else:
+                    return json.dumps(self.assemble_message(21, "Table guide has no items with given Index"),
+                                      ensure_ascii=False)
+        except Exception as _ex:
+            return json.dumps(self.assemble_message(20, _ex), ensure_ascii=False)
 
 # %%
     @staticmethod

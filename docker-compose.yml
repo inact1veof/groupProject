@@ -31,8 +31,9 @@ services:
             DOCKER_INFLUXDB_INIT_ORG:           ${DOCKER_INFLUXDB_INIT_ORG}
             DOCKER_INFLUXDB_INIT_BUCKET:        ${DOCKER_INFLUXDB_INIT_BUCKET}
             DOCKER_INFLUXDB_INIT_ADMIN_TOKEN:   ${DOCKER_INFLUXDB_INIT_ADMIN_TOKEN}
+            DOCKER_INFLUXDB_INIT_CLI_CONFIG_NAME: configname
         volumes:
-            - influxdbv2:/var/lib/influxdb2:rw
+            - influxdbv2:/var/lib/influxdb2
             - ./db/influx_db/PM10.csv:/bin/PM10.csv
             - ./db/influx_db/influx_init.sh:/docker-entrypoint-initdb.d/influx_init.sh
         hostname: influxdb

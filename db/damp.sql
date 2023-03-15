@@ -29,7 +29,7 @@ CREATE TABLE "public"."company" (
 ) WITH (oids = false);
 
 INSERT INTO "company" ("id", "city_id", "name", "description", "longitude", "latitude", "sanitary_zone_radius") VALUES
-(1,	1,	'ЛУКОЙЛ-Пермнефтеоргсинтез',	NULL,	57.922318,	56.134647,	NULL);
+(1,	1,	'ЛУКОЙЛ-Пермнефтеоргсинтез',	NULL,	56.1346460146535,	57.92231916465072,	NULL);
 
 CREATE TABLE "public"."gas_analyzer" (
     "measurement" character varying(100) NOT NULL,
@@ -40,14 +40,14 @@ CREATE TABLE "public"."gas_analyzer" (
 ) WITH (oids = false);
 
 INSERT INTO "gas_analyzer" ("measurement", "company_id", "longitude", "latitude") VALUES
-('gas_analyzer_1',	1,	57.952896,	56.13388),
-('gas_analyzer_2',	1,	57.8943,	56.13321),
-('gas_analyzer_3',	1,	57.89791,	56.090485),
-('gas_analyzer_4',	1,	57.928215,	56.073975),
-('gas_analyzer_5',	1,	57.944523,	56.08537),
-('gas_analyzer_6',	1,	57.914364,	56.204987),
-('gas_analyzer_7',	1,	57.88695,	56.176563),
-('gas_analyzer_8',	1,	57.8839,	56.15102);
+('gas_analyzer_1',	1,	56.1338811120596,	57.95289533980933),
+('gas_analyzer_2',	1,	56.1867691771204,	57.94070228983883),
+('gas_analyzer_3',	1,	56.20498713933395,	57.91436234775402),
+('gas_analyzer_4',	1,	56.18411612461943,	57.89042563976504),
+('gas_analyzer_5',	1,	56.13866055102109,	57.88499722322343),
+('gas_analyzer_6',	1,	56.086364168788265,	57.90284450835055),
+('gas_analyzer_7',	1,	56.07534925656922,	57.92437878990272),
+('gas_analyzer_8',	1,	56.09395113649093,	57.945436405625635);
 
 CREATE TABLE "public"."pipe" (
     "measurement" character varying(100) NOT NULL,
@@ -58,11 +58,24 @@ CREATE TABLE "public"."pipe" (
 ) WITH (oids = false);
 
 INSERT INTO "pipe" ("measurement", "company_id", "longitude", "latitude") VALUES
-('pipe_1',	1,	57.920807,	56.14872),
-('pipe_2',	1,	57.925385,	56.12424),
-('pipe_3',	1,	57.90992,	56.132294),
-('pipe_4',	1,	57.9092,	56.121628),
-('pipe_5',	1,	57.916897,	56.11879);
+('pipe_1',	1,	56.1487195730304,	57.92080497904481),
+('pipe_2',	1,	56.12424034685258,	57.92538636947342),
+('pipe_3',	1,	56.13229364907698,	57.909919616174015),
+('pipe_4',	1,	56.121629186534754,	57.909197899621944),
+('pipe_5',	1,	56.11878956521833,	57.91689793503993);
+
+CREATE SEQUENCE guide_record_id_seq INCREMENT 1 MINVALUE 1 MAXVALUE 2147483647 CACHE 1;
+
+CREATE TABLE "public"."guide" (
+    "id" integer DEFAULT nextval('guide_record_id_seq') NOT NULL,
+    "substance_name" character varying(100) NOT NULL,
+    "pdk_mr" real NOT NULL,
+    "pdk_ss" real NOT NULL
+) WITH (oids = false);
+
+INSERT INTO "guide" ("id", "substance_name", "pdk_mr", "pdk_ss") VALUES
+(1, 'PM_10', 0.3, 0,3);
+
 
 ALTER TABLE ONLY "public"."company" ADD CONSTRAINT "company_city_id_fkey" FOREIGN KEY (city_id) REFERENCES city(id) ON UPDATE CASCADE ON DELETE CASCADE NOT DEFERRABLE;
 
