@@ -4,7 +4,6 @@ import json
 from flask import Flask, jsonify, request, Response
 from flask_cors import CORS, cross_origin
 
-
 from connections.influx_connection import InfluxConnection
 from connections.postgres_connection import PostgresConnection
 from logger import get_logger
@@ -86,6 +85,34 @@ async def companies_by_city_id(city_id: int):
     check_postgres_connection()
 
     return await postgres_connection.get_companies_by_city_id(city_id)
+
+
+# guide
+
+@app.route('/guide', methods=['GET', 'POST'])
+async def guide() -> str:
+    """
+    Обрабатывает GET запрос /guide
+    :return: str
+    """
+    check_postgres_connection()
+
+    if request.method == 'GET':
+        return await postgres_connection.get_guide()
+    elif request.method == 'POST':
+        data = request.get_json()
+        return await postgres_connection.post_guide(data)
+
+
+@app.route('/guide/<id>', methods=['DELETE'])
+async def remove_guide(id: int) -> str:
+    """
+    Обрабатывает DELETE запрос удаления /guide/id
+    :return: str
+    """
+    check_postgres_connection()
+
+    return await postgres_connection.delete_guide_record_by_id(id)
 
 
 # %% gas_analyzers
@@ -211,6 +238,28 @@ async def weather_from_influx():
 @app.route('/')
 def hello_world():  # put application's code here
     return 'Hello World!'
+
+
+@app.route('/calculate', methods=['GET'])
+async def calculate_heatmap():
+    check_influx_connection()
+
+    if request.method == 'GET':
+        longitude = float(request.args.get('longitude'))
+        latitude = float(request.args.get('latitude'))
+        winddirection = float(request.args.get('winddirection'))
+        return await calculation(longitude, latitude, winddirection)
+
+
+async def calculation(longitude: float, latitude: float, winddirection: float):
+    """
+    Ждем код от Мишы
+    """
+
+    return json.dumps({
+        "code": int(40),
+        "message": str("Doesn't implement yet")
+    }, ensure_ascii=False)
 
 
 def check_postgres_connection():

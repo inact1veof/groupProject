@@ -6,6 +6,43 @@ servers:
   - url: http://localhost:8000
     description: web-app-api
 paths:
+  /calculate:
+    get:
+      summary: Calculate Data
+      tags:
+        - Calculate Data
+      operationId: getCalculatedData
+      parameters:
+        - name: longitude
+          in: query
+          required: true
+          description: Longitude
+          schema:
+            type: string
+          example: 57.99977
+        - name: latitude
+          in: query
+          required: true
+          description: Latitude
+          schema:
+            type: number
+          example: 57.99977
+        - name: winddirection
+          in: query
+          required: true
+          description: WindDirection
+          schema:
+            type: number
+          example: 270
+      responses:
+        'default':
+          description: Something is wrong
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+
   /cities:
     get:
       summary: The method of obtaining a list of cities
@@ -470,6 +507,75 @@ paths:
               schema:
                 $ref: "#/components/schemas/Error"
 
+  /guide:
+    get:
+      summary: The method of obtaining a guide
+      tags:
+        - Guide
+      operationId: getGuide
+      responses:
+        '200':
+          description: Getting a guide
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Guide"
+        'default':
+          description: Something is wrong
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+    post:
+      summary: The method of creating a guide record
+      tags:
+        - Guide
+      operationId: createGuideRecord
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/GuidePost"
+      responses:
+        '200':
+          description: Successful creation of the guide record
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Guide"
+        'default':
+          description: Something is wrong
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+  /guide/{id}:
+    delete:
+      summary: The method of deleting a guide record
+      tags:
+        - Guide
+      operationId: deleteGuideRecordById
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Guide Record ID
+          schema:
+            type: string
+          example: 1
+      responses:
+        '200':
+          description: Successful deletion of the record
+          content:
+            application/json: { }
+        'default':
+          description: Something is wrong
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
 
   /influx/gas_analyzer:
     get:
@@ -614,6 +720,26 @@ components:
           type: number
           example: 56.266792
 
+    Guide_Record:
+      type: object
+      required:
+        - substance_name
+        - pdk_mr
+        - pdk_ss
+      properties:
+        id:
+          type: integer
+          example: 13
+        substance_name:
+          type: string
+          example: PM_10
+        pdk_mr:
+          type: number
+          example: 0.5
+        pdk_ss:
+          type: number
+          example: 0.5
+
     CityPost:
       type: object
       required:
@@ -631,11 +757,33 @@ components:
           type: number
           example: 56.266792
 
+    GuidePost:
+      type: object
+      required:
+        - substance_name
+        - pdk_mr
+        - pdk_ss
+      properties:
+        substance_name:
+          type: string
+          example: PM_10
+        pdk_mr:
+          type: number
+          example: 0.5
+        pdk_ss:
+          type: number
+          example: 0.5
+
 
     Cities:
       type: array
       items:
         $ref: "#/components/schemas/City"
+
+    Guide:
+      type: array
+      items:
+        $ref: "#/components/schemas/Guide_Record"
 
 
     Company:
@@ -652,11 +800,11 @@ components:
           example: 99
         city_id:
           type: integer
-          example: 13
+          example: 1
         name:
           type: string
           example: Company-1
-        sanitary_zone_radius_m:
+        sanitary_zone_radius:
           type: number
           example: 100
         latitude:
