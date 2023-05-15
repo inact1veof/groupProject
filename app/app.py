@@ -251,6 +251,10 @@ async def calculate_heatmap():
         return await calculation(longitude, latitude, winddirection)
 
 
+@app.route('/data', methods=['GET'])
+async def get_data(user_id):
+    pass
+
 async def calculation(longitude: float, latitude: float, winddirection: float):
     """
     Ждем код от Мишы

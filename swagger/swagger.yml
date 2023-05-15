@@ -6,6 +6,102 @@ servers:
   - url: http://localhost:8000
     description: web-app-api
 paths:
+  /run_series:
+    post:
+      summary: Серия прогнозирования
+      tags:
+        - Forecasts
+  /run_later:
+    post:
+      summary: Запланированное прогнозирование
+      tags:
+        - Forecasts
+  /run_instant:
+    post:
+      summary: Разовое прогнозирование
+      tags:
+        - Forecasts
+  /forecasts/{user_id}:
+    get:
+      summary: Получение всех прогнозов пользователя
+      tags:
+        - Forecasts
+  /forecasts/{id}:
+    get:
+      summary: Получение данных прогноза по id
+      tags:
+        - Forecasts
+    delete:
+      summary: Удаление результата прогноза
+      tags:
+        - Forecasts
+
+  /models:
+    post:
+      summary: Добавление новой модели
+      tags:
+        - Models
+      parameters:
+        - name: id
+  /models/{user_id}:
+    get:
+      summary: Получение информации о пользовательских моделях
+      tags:
+        - Models
+      parameters:
+        - name: user_id
+  /models/{id}:
+    get:
+      summary: Получение информации о модели по id
+      tags:
+        - Models
+      parameters:
+        - name: user_id
+    put:
+      summary: Изменение параметров модели
+      tags:
+        - Models
+      parameters:
+        - name: id
+    delete:
+      summary: Удаление модели
+      tags:
+        - Models
+      parameters:
+        - name: id
+  /data/{user_id}:
+    get:
+      summary: Получение информации о данных измерения пользователя
+      tags:
+        - Data
+      parameters:
+        - name: user_id
+  /data/{id}:
+    get:
+      summary: Получение информации о данных измерения по id
+      tags:
+        - Data
+      parameters:
+        - name: id
+    put:
+      summary: Изменение данных измерений
+      tags:
+        - Data
+      parameters:
+        - name: id
+    delete:
+      summary: Удаление данных измерений
+      tags:
+        - Data
+      parameters:
+        - name: id
+  /data:
+    post:
+      summary: Создание нового набора данных
+      tags:
+        - Data
+      parameters:
+        - name: id
   /calculate:
     get:
       summary: Calculate Data
@@ -693,7 +789,6 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Error"
-
 
 
 
